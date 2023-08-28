@@ -1,0 +1,16 @@
+{
+  "data": {
+    "TEST_A": {
+      "active": true,
+      "version": "default"
+    },
+    "TEST_B": {
+      "active": true,
+      "version": "v1"
+    },
+    "TEST_C": {
+      "active": false,
+      "version": "v2"
+    }
+  }
+}
