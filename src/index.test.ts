@@ -172,10 +172,18 @@ test("Passing a user context in the setter overrides the user context from the c
   });
 
   featurit.setUserContext(
-    new DefaultFeaturitUserContext("9876", null, "127.0.0.1"),
+    new DefaultFeaturitUserContext(
+        "9876",
+        null,
+        "127.0.0.1",
+        new Map<string, any>([
+            ["role", "admin"],
+            ["city", "Barcelona"],
+        ])
+    ),
   );
 
   const userContext = featurit.getUserContext();
 
-  expect(userContext.getUserId()).toBe("9876");
+  expect(userContext.getCustomAttribute("city")).toBe("Barcelona");
 });
