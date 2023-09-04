@@ -1,10 +1,18 @@
 {
   "name": "featurit-sdk-js-browser",
+  "version": "0.0.1",
   "description": "Browser Javascript/Typescript SDK for FeaturIT",
+  "license": "MIT",
+  "author": "FeaturIT",
+  "main": "./build/commonjs/index.js",
+  "types": "./build/commonjs/index.d.ts",
   "scripts": {
     "build": "rm -rf build && tsc",
     "lint": "prettier src --check && eslint src",
     "test": "jest"
+  },
+  "dependencies": {
+    "events": "^3.3.0"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
@@ -18,9 +26,5 @@
     "ts-jest": "^29.1.1",
     "tslib": "^2.6.0",
     "typescript": "^5.1.6"
-  },
-  "dependencies": {
-    "events": "^3.3.0"
-  },
-  "version": "0.0.1"
+  }
 }
