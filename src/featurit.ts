@@ -19,7 +19,7 @@ export const FEATURIT_EVENTS = {
   CHANGED: "changed",
 };
 
-interface FeaturitSetup {
+export interface FeaturitSetup {
   tenantIdentifier: string;
   frontendApiKey: string;
   enableAnalytics?: boolean;
