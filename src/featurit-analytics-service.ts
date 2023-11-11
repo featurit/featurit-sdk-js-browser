@@ -1,5 +1,5 @@
 import { FeaturitStorage } from "./featurit-storage";
-import { FeatureFlagValue, STORAGE_KEY } from "./index";
+import { FeatureFlagValue, STORAGE_KEY } from "./featurit";
 
 interface AnalyticsBucket {
   start: Date;

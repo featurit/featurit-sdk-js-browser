@@ -1,4 +1,4 @@
-import { Featurit } from "./index";
+import { Featurit } from "./featurit";
 import fetchMock from "jest-fetch-mock";
 import * as mockResponseWithContext from "../test/mockApiResponseWithContext.json";
 import * as mockResponseWithoutContext from "../test/mockApiResponseWithoutContext.json";
