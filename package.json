@@ -1,10 +1,25 @@
 {
   "name": "featurit-sdk-js-browser",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Browser Javascript/Typescript SDK for FeaturIT",
   "license": "MIT",
   "author": "FeaturIT",
-  "files": ["./build/commonjs/**"],
+  "keywords": [
+    "featurit",
+    "feature flag",
+    "feature toggle",
+    "user targeting",
+    "a b testing",
+    "feature",
+    "feature management"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/featurit/featurit-sdk-js-browser"
+  },
+  "files": [
+    "./build/commonjs/**"
+  ],
   "main": "./build/commonjs/index.js",
   "types": "./build/commonjs/index.d.ts",
   "scripts": {

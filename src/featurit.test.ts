@@ -108,19 +108,26 @@ test("Method version returns the proper value when context is sent.", async () =
 });
 
 test("It works properly even if the API is failing.", async () => {
+  localStorage.setItem(
+    "featurit:featureFlags",
+    '{"TEST_B":{"active":true,"version":"v1"}}',
+  );
+
   fetchMock.mockResponseOnce("{}", { status: 500 });
 
   const featurit = new Featurit({
-    tenantIdentifier: "test",
+    tenantIdentifier: "test2",
     frontendApiKey: "test",
     apiClient: fetchMock,
   });
 
   await featurit.init();
 
+  const isActive = featurit.isActive("TEST_B");
   const version = featurit.version("TEST_B");
 
-  expect(version).toBe("default");
+  expect(isActive).toBe(true);
+  expect(version).toBe("v1");
 });
 
 test("Passing a user context in the constructor overrides the user context provider.", async () => {
@@ -173,13 +180,13 @@ test("Passing a user context in the setter overrides the user context from the c
 
   featurit.setUserContext(
     new DefaultFeaturitUserContext(
-        "9876",
-        null,
-        "127.0.0.1",
-        new Map<string, any>([
-            ["role", "admin"],
-            ["city", "Barcelona"],
-        ])
+      "9876",
+      null,
+      "127.0.0.1",
+      new Map<string, any>([
+        ["role", "admin"],
+        ["city", "Barcelona"],
+      ]),
     ),
   );
 

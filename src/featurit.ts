@@ -152,8 +152,7 @@ export class Featurit extends EventEmitter {
     const featureFlagValue: FeatureFlagValue | undefined =
       this.featureFlags.get(featureName);
 
-    if (typeof featureFlagValue == "undefined") {
-      // TODO: Should we send analytics here?
+    if (featureFlagValue === undefined) {
       return false;
     }
 
@@ -195,6 +194,10 @@ export class Featurit extends EventEmitter {
         },
       });
 
+      if (!response.ok) {
+        throw new Error("Server Error");
+      }
+
       const data = await response.json();
 
       if (
@@ -205,6 +208,10 @@ export class Featurit extends EventEmitter {
       }
 
       const featureFlags: FeatureFlagList = data.data;
+
+      if (featureFlags === undefined) {
+        return;
+      }
 
       this.storage.set(STORAGE_KEY.FEATURE_FLAGS, featureFlags);
 
