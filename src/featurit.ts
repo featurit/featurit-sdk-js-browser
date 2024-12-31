@@ -5,6 +5,7 @@ import { LocalStorageFeaturitStorage } from "./local-storage-featurit-storage";
 import { FeaturitUserContext } from "./featurit-user-context";
 import { FeaturitAnalyticsService } from "./featurit-analytics-service";
 import { EventEmitter } from "events";
+import {FeaturitTrackingService} from "./featurit-tracking-service";
 
 const DEFAULT_REFRESH_INTERVAL_MINUTES = 5;
 const DEFAULT_SEND_ANALYTICS_INTERVAL_MINUTES = 1;
@@ -13,6 +14,8 @@ const DEFAULT_VERSION = "default";
 export const STORAGE_KEY = {
   FEATURE_FLAGS: "featureFlags",
   ANALYTICS: "analytics",
+  EVENTS: "events",
+  PEOPLE: "people",
 };
 
 export const FEATURIT_EVENTS = {
@@ -23,6 +26,7 @@ export interface FeaturitSetup {
   tenantIdentifier: string;
   frontendApiKey: string;
   enableAnalytics?: boolean;
+  enableTracking?: boolean;
   refreshIntervalMinutes?: number;
   sendAnalyticsIntervalMinutes?: number;
   featuritUserContext?: FeaturitUserContext;
@@ -62,6 +66,7 @@ export class Featurit extends EventEmitter {
   private readonly tenantIdentifier: string;
   private readonly frontendApiKey: string;
   private readonly isAnalyticsEnabled: boolean;
+  private readonly isTrackingEnabled: boolean;
 
   private featuritUserContextProvider: FeaturitUserContextProvider =
     new DefaultFeaturitUserContextProvider();
@@ -75,6 +80,9 @@ export class Featurit extends EventEmitter {
   private readonly sendAnalyticsIntervalMinutes: number;
   private analyticsService: FeaturitAnalyticsService;
 
+  private readonly sendTrackingIntervalMinutes: number;
+  private trackingService: FeaturitTrackingService;
+
   private featureFlags: Map<string, FeatureFlagValue> = new Map<
     string,
     FeatureFlagValue
@@ -86,6 +94,7 @@ export class Featurit extends EventEmitter {
     tenantIdentifier,
     frontendApiKey,
     enableAnalytics = false,
+    enableTracking = false,
     refreshIntervalMinutes = DEFAULT_REFRESH_INTERVAL_MINUTES,
     sendAnalyticsIntervalMinutes = DEFAULT_SEND_ANALYTICS_INTERVAL_MINUTES,
     featuritUserContext,
@@ -122,6 +131,32 @@ export class Featurit extends EventEmitter {
       this.apiBaseUrl,
     );
 
+    this.isTrackingEnabled = enableTracking ?? false;
+    this.sendTrackingIntervalMinutes = 1;
+
+    this.trackingService = new FeaturitTrackingService(
+      this.storage,
+      this.apiClient,
+      this.sendTrackingIntervalMinutes,
+      this.apiBaseUrl
+    );
+
+    if (this.isTrackingEnabled) {
+      if (window.navigator.sendBeacon != undefined && window.addEventListener != undefined) {
+        window.addEventListener("pagehide", async (event: PageTransitionEvent) => {
+          if (event.persisted) {
+            await this.trackingService.sendTrackingInformationToAPI(true);
+          }
+        });
+
+        window.addEventListener("visibilitychange", async () => {
+          if (document.visibilityState == "hidden") {
+            await this.trackingService.sendTrackingInformationToAPI(true);
+          }
+        });
+      }
+    }
+
     this.getFeatureFlagsFromStorage();
   }
 
@@ -141,6 +176,10 @@ export class Featurit extends EventEmitter {
 
     if (this.isAnalyticsEnabled) {
       this.analyticsService.init();
+    }
+
+    if (this.isTrackingEnabled) {
+      this.trackingService.init();
     }
   }
 
@@ -169,6 +208,38 @@ export class Featurit extends EventEmitter {
 
   public version(featureName: string): string {
     return this.featureFlags.get(featureName)?.version ?? DEFAULT_VERSION;
+  }
+
+  public track(eventName: string, properties: Record<string, string | number> = {}): void {
+    if (!this.isTrackingEnabled) {
+      return;
+    }
+
+    this.trackingService.track(eventName, properties);
+  }
+
+  public trackPerson(): void {
+    if (!this.isTrackingEnabled) {
+      return;
+    }
+
+    this.trackingService.addPerson(this.getUserContext());
+  }
+
+  public register(propertyName: string, propertyValue: any): void {
+    if (!this.isTrackingEnabled) {
+      return;
+    }
+
+    this.trackingService.register(propertyName, propertyValue);
+  }
+
+  public async flush(): Promise<void> {
+    if (!this.isTrackingEnabled) {
+      return;
+    }
+
+    await this.trackingService.sendTrackingInformationToAPI();
   }
 
   public getUserContext(): FeaturitUserContext {
@@ -267,9 +338,7 @@ export class Featurit extends EventEmitter {
     const ipAddress = context.getIpAddress();
 
     const urlSearchParams = new URLSearchParams();
-    for (let [propertyName, propertyValue] of context
-      .getCustomAttributes()
-      .entries()) {
+    for (const [propertyName, propertyValue] of context.getCustomAttributes().entries()) {
       if (
         propertyValue == "" ||
         propertyValue == null ||

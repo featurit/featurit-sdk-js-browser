@@ -13,5 +13,5 @@ export interface FeaturitUserContext {
   getCustomAttribute: (attributeName: string) => any | null;
   getAttribute: (attributeName: string) => any | null;
 
-  toArray: () => string[];
+  toJson: () => Record<string, any>;
 }
