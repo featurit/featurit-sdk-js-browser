@@ -29,6 +29,7 @@ const featurit = new Featurit({
     refreshIntervalMinutes: 5,
     sendAnalyticsIntervalMinutes: 1,
     enableAnalytics: true,
+    enableTracking: true,
 });
 
 // Start the syncronization with the FeaturIT API.
@@ -65,6 +66,7 @@ const featurit = new Featurit({
     refreshIntervalMinutes: 5,
     sendAnalyticsIntervalMinutes: 1,
     enableAnalytics: true,
+    enableTracking: true,
 });
 
 // Alternatively, we can pass it after constructing
@@ -132,3 +134,62 @@ class MyFeaturitUserContextProvider {
     }
 }
 ```
+
+### Event Tracking
+
+In order to track some event in your application, you can add this once the event has happened:
+
+```javascript
+// First we define our UserContext with the attributes 
+// we have available in our application.
+const myFeaturitUserContext = new DefaultFeaturitUserContext(
+  'my-user-id',
+  'my-session-id',
+  'my-ip-address',
+  new Map([
+    ['role', 'ADMIN'],
+    ['email', 'featurit.tech@gmail.com'],
+  ])
+);
+
+// Then we can pass it to the Featurit client constructor.
+// (It is important to have the enableTracking flag set to true).
+const featurit = new Featurit({
+  tenantIdentifier: "my-tenant-subdomain",
+  frontendApiKey: "my-frontend-api-key",
+  featuritUserContext: myFeaturitUserContext,
+  refreshIntervalMinutes: 5,
+  sendAnalyticsIntervalMinutes: 1,
+  enableAnalytics: true,
+  enableTracking: true,
+});
+
+// (OPTIONAL) We can register global properties that will be sent with every
+// Person and Tracking Event from now on.
+featurit.register("my-global-property", "my-global-property-value");
+
+// This line will register the current FeaturitUserContext and link it to all the 
+// following tracking events.
+featurit.trackPerson();
+
+// This will start to periodically send to the server the tracking information.
+await featurit.init();
+
+// The track method will be used to send a new tracking event to the server.
+// We can add as many properties to our events as we want.
+featurit.track("my-event-name", {
+  "my-event-property": "my-property-value",
+});
+
+// (OPTIONAL) Sometimes we want the event to be sent inmediately to the server,
+// If so, we can use the following line:
+featurit.flush();
+```
+
+### Authors
+
+FeaturIT
+
+https://www.featurit.com
+
+featurit.tech@gmail.com
