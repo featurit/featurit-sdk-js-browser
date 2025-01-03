@@ -1,6 +1,6 @@
 {
   "name": "featurit-sdk-js-browser",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Browser Javascript/Typescript SDK for FeaturIT",
   "license": "MIT",
   "author": "FeaturIT",
