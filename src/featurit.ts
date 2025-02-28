@@ -27,6 +27,7 @@ export interface FeaturitSetup {
   frontendApiKey: string;
   enableAnalytics?: boolean;
   enableTracking?: boolean;
+  sendBrowserInfo?: boolean;
   refreshIntervalMinutes?: number;
   sendAnalyticsIntervalMinutes?: number;
   featuritUserContext?: FeaturitUserContext;
@@ -95,6 +96,7 @@ export class Featurit extends EventEmitter {
     frontendApiKey,
     enableAnalytics = false,
     enableTracking = false,
+    sendBrowserInfo = false,
     refreshIntervalMinutes = DEFAULT_REFRESH_INTERVAL_MINUTES,
     sendAnalyticsIntervalMinutes = DEFAULT_SEND_ANALYTICS_INTERVAL_MINUTES,
     featuritUserContext,
@@ -138,7 +140,8 @@ export class Featurit extends EventEmitter {
       this.storage,
       this.apiClient,
       this.sendTrackingIntervalMinutes,
-      this.apiBaseUrl
+      this.apiBaseUrl,
+      sendBrowserInfo,
     );
 
     if (this.isTrackingEnabled) {

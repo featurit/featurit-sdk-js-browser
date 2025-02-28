@@ -1,6 +1,8 @@
 import {Featurit, STORAGE_KEY} from "./featurit";
 import fetchMock from "jest-fetch-mock";
+// @ts-ignore
 import * as mockResponseWithContext from "../test/mockApiResponseWithContext.json";
+// @ts-ignore
 import * as mockResponseWithoutContext from "../test/mockApiResponseWithoutContext.json";
 import {DefaultFeaturitUserContext} from "./default-featurit-user-context";
 import {DefaultFeaturitUserContextProvider} from "./default-featurit-user-context-provider";

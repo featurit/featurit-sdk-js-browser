@@ -24,19 +24,20 @@ In your package.json directory run
 
 ```javascript
 const featurit = new Featurit({
-    tenantIdentifier: "my-tenant-subdomain",
-    frontendApiKey: "my-frontend-api-key",
-    refreshIntervalMinutes: 5,
-    sendAnalyticsIntervalMinutes: 1,
-    enableAnalytics: true,
-    enableTracking: true,
+  tenantIdentifier: "my-tenant-subdomain",
+  frontendApiKey: "my-frontend-api-key",
+  refreshIntervalMinutes: 5,
+  sendAnalyticsIntervalMinutes: 1,
+  enableAnalytics: true,
+  enableTracking: true,
+  sendBrowserInfo: true,
 });
 
 // Start the syncronization with the FeaturIT API.
-await featurit.init(); 
+await featurit.init();
 
 if (featurit.isActive('MY_FEATURE_NAME')) {
-    my_feature_code();
+  my_feature_code();
 }
 ```
 
@@ -49,24 +50,25 @@ to your users depending on certain attributes.
 // First we define our UserContext with the attributes 
 // we have available in our application.
 const myFeaturitUserContext = new DefaultFeaturitUserContext(
-    'my-user-id',
-    'my-session-id',
-    'my-ip-address',
-    new Map([
-        ['role', 'ADMIN'],
-        ['email', 'featurit.tech@gmail.com'],
-    ])
+  'my-user-id',
+  'my-session-id',
+  'my-ip-address',
+  new Map([
+    ['role', 'ADMIN'],
+    ['email', 'featurit.tech@gmail.com'],
+  ])
 );
 
 // Then we can pass it to the Featurit client constructor.
 const featurit = new Featurit({
-    tenantIdentifier: "my-tenant-subdomain",
-    frontendApiKey: "my-frontend-api-key",
-    featuritUserContext: myFeaturitUserContext,
-    refreshIntervalMinutes: 5,
-    sendAnalyticsIntervalMinutes: 1,
-    enableAnalytics: true,
-    enableTracking: true,
+  tenantIdentifier: "my-tenant-subdomain",
+  frontendApiKey: "my-frontend-api-key",
+  featuritUserContext: myFeaturitUserContext,
+  refreshIntervalMinutes: 5,
+  sendAnalyticsIntervalMinutes: 1,
+  enableAnalytics: true,
+  enableTracking: true,
+  sendBrowserInfo: true,
 });
 
 // Alternatively, we can pass it after constructing
@@ -77,14 +79,14 @@ const featurit = new Featurit({
 featurit.setUserContext(myFeaturitUserContext);
 
 // Start the syncronization with the FeaturIT API.
-await featurit.init(); 
+await featurit.init();
 
 if (featurit.isActive('MY_FEATURE_NAME')) {
-    if (featurit.version('MY_FEATURE_NAME') == 'v1') {
-        my_feature_v1_code();
-    } else if (featurit.version('MY_FEATURE_NAME') == 'v2') {
-        my_feature_v2_code();
-    }
+  if (featurit.version('MY_FEATURE_NAME') == 'v1') {
+    my_feature_v1_code();
+  } else if (featurit.version('MY_FEATURE_NAME') == 'v2') {
+    my_feature_v2_code();
+  }
 }
 ```
 
@@ -98,40 +100,40 @@ and pass it to the Featurit client constructor.
 
 ```typescript
 // In Typescript
-class MyFeaturitUserContextProvider 
-    implements FeaturitUserContextProvider {
-    
-    getContext(): FeaturitUserContext {
-        contextData = get_my_context_data();
-        
-        return new DefaultFeaturitUserContext(
-            contextData['userId'],
-            contextData['sessionId'],
-            contextData['ipAddress'],
-            new Map([
-                ['role', contextData['role']],
-                ['email', contextData['email']],
-            ])
-        );
-    }
+class MyFeaturitUserContextProvider
+  implements FeaturitUserContextProvider {
+
+  getContext(): FeaturitUserContext {
+    const contextData = get_my_context_data();
+
+    return new DefaultFeaturitUserContext(
+      contextData['userId'],
+      contextData['sessionId'],
+      contextData['ipAddress'],
+      new Map([
+        ['role', contextData['role']],
+        ['email', contextData['email']],
+      ])
+    );
+  }
 }
 
 // In Javascript
 class MyFeaturitUserContextProvider {
 
-    getContext() {
-        contextData = get_my_context_data();
+  getContext() {
+    contextData = get_my_context_data();
 
-        return new DefaultFeaturitUserContext(
-            contextData['userId'],
-            contextData['sessionId'],
-            contextData['ipAddress'],
-            new Map([
-                ['role', contextData['role']],
-                ['email', contextData['email']],
-            ])
-        );
-    }
+    return new DefaultFeaturitUserContext(
+      contextData['userId'],
+      contextData['sessionId'],
+      contextData['ipAddress'],
+      new Map([
+        ['role', contextData['role']],
+        ['email', contextData['email']],
+      ])
+    );
+  }
 }
 ```
 
@@ -148,12 +150,13 @@ const myFeaturitUserContext = new DefaultFeaturitUserContext(
   'my-ip-address',
   new Map([
     ['role', 'ADMIN'],
-    ['email', 'featurit.tech@gmail.com'],
+    ['email', 'tech@featurit.com'],
   ])
 );
 
 // Then we can pass it to the Featurit client constructor.
-// (It is important to have the enableTracking flag set to true).
+// It is important to have the enableTracking flag set to true,
+// and also you need to choose if you want to send browser information with your event.
 const featurit = new Featurit({
   tenantIdentifier: "my-tenant-subdomain",
   frontendApiKey: "my-frontend-api-key",
@@ -162,6 +165,7 @@ const featurit = new Featurit({
   sendAnalyticsIntervalMinutes: 1,
   enableAnalytics: true,
   enableTracking: true,
+  sendBrowserInfo: true,
 });
 
 // (OPTIONAL) We can register global properties that will be sent with every
@@ -177,6 +181,9 @@ await featurit.init();
 
 // The track method will be used to send a new tracking event to the server.
 // We can add as many properties to our events as we want.
+
+// But always make sure the properties don't start with an _underscore,
+// as it is for reserved keywords.
 featurit.track("my-event-name", {
   "my-event-property": "my-property-value",
 });
@@ -192,4 +199,4 @@ FeaturIT
 
 https://www.featurit.com
 
-featurit.tech@gmail.com
+tech@featurit.com

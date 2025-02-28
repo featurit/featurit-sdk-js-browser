@@ -1,6 +1,7 @@
 import {FeaturitStorage} from "./featurit-storage";
 import {STORAGE_KEY} from "./featurit";
 import {FeaturitUserContext} from "./featurit-user-context";
+import packageJson from "../package.json";
 
 export interface TrackingEvent {
   event: string;
@@ -21,6 +22,7 @@ export class FeaturitTrackingService {
     private apiClient: any,
     private sendTrackingIntervalMinutes: number,
     private apiBaseUrl: string,
+    private sendBrowserInfo: boolean = false,
   ) {
   }
 
@@ -40,14 +42,15 @@ export class FeaturitTrackingService {
   public track(eventName: string, properties: Record<string, any> = {}): void {
     const events: TrackingEvent[] = this.storage.get(STORAGE_KEY.EVENTS) ?? [];
 
-    if (properties["time"] == undefined) {
-      properties["time"] = Date.now() / 1000;
-    }
-
     events.push({
       event: eventName,
       properties: {
-        ...{ time: Date.now() / 1000 },
+        ...{
+          time: Date.now() / 1000,
+          '_sdk': 'js-browser',
+          '_version': packageJson.version
+        },
+        ...this.getBrowserInfo(),
         ...this.globalProperties,
         ...properties,
       },
@@ -71,7 +74,11 @@ export class FeaturitTrackingService {
       this.register("distinct_id", featuritUserContext.getUserId());
 
       people[featuritUserContext.getUserId()!] = {
-        ...{ time: Date.now() / 1000 },
+        ...{
+          time: Date.now() / 1000,
+          '_sdk': 'js-browser',
+          '_version': packageJson.version
+        },
         ...this.globalProperties,
         ...featuritUserContext.toJson(),
       };
@@ -79,7 +86,11 @@ export class FeaturitTrackingService {
       this.register("distinct_id", featuritUserContext.getSessionId());
 
       people[featuritUserContext.getSessionId()!] = {
-        ...{ time: Date.now() / 1000 },
+        ...{
+          time: Date.now() / 1000,
+          '_sdk': 'js-browser',
+          '_version': packageJson.version
+        },
         ...this.globalProperties,
         ...featuritUserContext.toJson(),
       };
@@ -176,5 +187,18 @@ export class FeaturitTrackingService {
         "Something failed sending the People to the FeaturIT API",
       );
     }
+  }
+
+  private getBrowserInfo() {
+    if (!this.sendBrowserInfo) {
+      return {};
+    }
+
+    // TODO: Increase scope in the future
+    return {
+      '_current_url': window.location.href,
+      '_screen_width': window.screen.width,
+      '_screen_height': window.screen.height,
+    };
   }
 }
