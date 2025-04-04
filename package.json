@@ -1,6 +1,6 @@
 {
   "name": "featurit-sdk-js-browser",
-  "version": "0.2.1",
+  "version": "0.2.5",
   "description": "Browser Javascript/Typescript SDK for FeaturIT",
   "license": "MIT",
   "author": "FeaturIT",
@@ -20,8 +20,8 @@
   "files": [
     "./build/commonjs/**"
   ],
-  "main": "./build/commonjs/index.js",
-  "types": "./build/commonjs/index.d.ts",
+  "main": "./build/commonjs/src/index.js",
+  "types": "./build/commonjs/src/index.d.ts",
   "scripts": {
     "build": "rm -rf build && tsc",
     "lint": "prettier src --check && eslint src",
